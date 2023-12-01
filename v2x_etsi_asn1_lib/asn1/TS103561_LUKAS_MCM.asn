@@ -1,0 +1,182 @@
+MCM-PDU-Descriptions {
+	itu-t (0) identified-organization (4) etsi (0) itsDomain (5) wg1 (1) tr (103563) mcm (1) version (1)
+}
+DEFINITIONS AUTOMATIC TAGS ::=
+BEGIN
+IMPORTS
+    ItsPduHeader,
+    StationID,
+    HeadingValue,
+    CartesianCoordinateLarge,
+    Speed,
+    CartesianAngleValue,
+    GenerationDeltaTime,
+    BasicContainer
+FROM ETSI-ITS-CDD {itu-t (0) identified-organization (4) etsi (0) itsDomain (5) wg1 (1) ts (102894) cdd (2) major-version-4 (4) minor-version-1 (1)} WITH SUCCESSORS;
+
+--  The root data frame for maneuver coordination message
+MCM ::= SEQUENCE {
+	header  ItsPduHeader,
+	mcm     ManeuverCoordinationMessage
+}
+
+ManeuverCoordinationMessage ::= SEQUENCE {
+	generationDeltaTime GenerationDeltaTime,
+	mcmParameters       McmParameters
+}
+
+McmParameters ::= SEQUENCE {
+	basicContainer      BasicContainer,
+	maneuverContainer   ManeuverContainer
+}
+
+ManeuverContainer ::= CHOICE {
+	roadUserContainer           RoadUserContainer,
+	suggestedManeuverContainer  SuggestedManeuverContainer
+}
+
+RoadUserContainer ::= SEQUENCE {
+	roadUserState       RoadUserState,
+	plannedTrajectory   PlannedTrajectory   OPTIONAL,
+	desiredRoute        DesiredRoute        OPTIONAL,
+	adviceResponse      AdviceResponse      OPTIONAL
+}
+
+RoadUserState ::= SEQUENCE {
+	roadUserType    RoadUserType,
+	speed           SpeedValue,
+	heading         HeadingValue,
+	length          RoadUserLength,
+	width           RoadUserWidth
+}
+
+RoadUserType ::= ENUMERATED {
+	connectedVehicle            (0),
+	connectedAutomatedVehicle   (1),
+	connectedCyclist            (2),
+	connectedPedestrian         (3),
+	connectedRoadSweeper        (4),
+	connectedCollectionVehicle  (5),
+	...
+}
+
+RoadUserLength ::= INTEGER {
+	tenCentimeters   (1),
+	outOfRange      (61),
+	unavailable     (62)
+} (1..62)
+
+RoadUserWidth ::= INTEGER {
+	tenCentimeters   (1),
+	outOfRange      (61),
+	unavailable     (62)
+} (1..62)
+
+PlannedTrajectory ::= SEQUENCE {
+	startDeltaTime              TrajectoryStartDeltaTime,
+	deltaTime                   TrajectoryPointDeltaTime,
+	trajectoryPointContainer    TrajectoryPointContainer
+}
+
+TrajectoryStartDeltaTime ::= INTEGER { oneMilliSec(1) } (0..65535)
+
+TrajectoryPointDeltaTime ::= INTEGER { oneMilliSec(1) } (1..255)
+
+TrajectoryPointContainer ::= SEQUENCE SIZE(1..128, ...) OF TrajectoryPoint
+
+TrajectoryPoint ::= SEQUENCE {
+	waypoint    Waypoint,
+	speed       SpeedValue,
+	heading     HeadingValue
+}
+
+Waypoint ::= SEQUENCE {
+	xDistance CartesianCoordinateLarge,
+	yDistance CartesianCoordinateLarge
+}
+
+DesiredRoute ::= SEQUENCE SIZE(1..128, ...) OF Waypoint
+
+AdviceResponse ::= SEQUENCE {
+	maneuverID      ManeuverID,
+	adviceUpdateID  AdviceUpdateID,
+	adviceFollowed  ManeuverResponse
+}
+
+ManeuverID ::= INTEGER (0..65535)
+
+AdviceUpdateID ::= INTEGER (0..65535)
+
+ManeuverResponse ::= ENUMERATED {accept(0), reject(1), pending(2)}
+
+SuggestedManeuverContainer ::= SEQUENCE {
+	targetStationID     StationID,
+	suggestedManeuver   SuggestedManeuver OPTIONAL
+}
+
+SuggestedManeuver ::= SEQUENCE {
+	maneuverID                          ManeuverID,
+	adviceUpdateID                      AdviceUpdateID,
+	participatingRoadUserIDContainer    ParticipatingRoadUserIDContainer,
+	confirmationRequiredFlag            ConfirmationRequiredFlag,
+	maneuverParameters                  ManeuverParameters
+}
+
+ParticipatingRoadUserIDContainer ::= SEQUENCE SIZE(1..128, ...) OF StationID
+
+ConfirmationRequiredFlag ::= BOOLEAN
+
+ManeuverParameters ::= CHOICE {
+	maneuverConstraints ManeuverConstraints,
+	terminationStatus   TerminationStatus
+}
+
+ManeuverConstraints ::= SEQUENCE {
+	maneuverType                            ManeuverType OPTIONAL,
+	longitudinalManeuverWaypointContainer   LongitudinalManeuverWaypointContainer,
+	maneuverCorridor                        Polygon OPTIONAL
+}
+
+ManeuverType ::= ENUMERATED {
+	freeTravel           (0),
+	followRoadUser       (1),
+	crossIntersection    (2),
+	yieldAtIntersection  (3),
+	overtake             (4),
+	pullOver             (5),
+	yieldAtObstacle      (6),
+	maneuverTypeUnknown  (15)
+}
+
+LongitudinalManeuverWaypointContainer ::= SEQUENCE SIZE(1..128, ...) OF LongitudinalWaypoint
+
+LongitudinalWaypoint ::= SEQUENCE {
+	waypoint                    Waypoint,
+	minArrivalTime              WaypointDeltaTime,
+	maxArrivalTime              WaypointDeltaTime,
+	minVelocity                 SpeedValue          OPTIONAL,
+	maxVelocity                 SpeedValue          OPTIONAL,
+	minDurationOfStop           WaypointDeltaTime           OPTIONAL,
+	precedingRoadUser           ParticipatingRoadUserIndex  OPTIONAL,
+	followingRoadUser           ParticipatingRoadUserIndex  OPTIONAL,
+	yieldToRoadUserContainer    YieldToRoadUserContainer    OPTIONAL
+}
+
+WaypointDeltaTime ::= INTEGER { oneMilliSec(1) } (0..65535)
+
+YieldToRoadUserContainer ::= SEQUENCE SIZE(1..16, ...) OF ParticipatingRoadUserIndex
+
+ParticipatingRoadUserIndex ::= INTEGER(0..127)
+
+Polygon ::= SEQUENCE SIZE(1..128, ...) OF Waypoint
+
+TerminationStatus ::= ENUMERATED {
+	regularEnd                           (0),
+	abortByReject                        (1),
+	abortByTimeout                       (2),
+	abortByConstraintViolation           (3),
+	abortByEmergencyVehicleAppearance    (4),
+	reasonUnknown                       (15)
+}
+
+END

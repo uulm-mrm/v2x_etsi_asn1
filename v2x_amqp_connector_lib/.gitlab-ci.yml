@@ -1,0 +1,79 @@
+variables:
+  GIT_STRATEGY: none
+  image_aduulm_rolling: mrm-git.e-technik.uni-ulm.de:4567/aduulm/docker_images/aduulm-ros2-rolling:latest
+  image_aduulm_iron: mrm-git.e-technik.uni-ulm.de:4567/aduulm/docker_images/aduulm-ros2-iron:latest
+
+stages:
+  - library
+  - library_test
+  - ros
+
+.build_library:
+  stage: library
+  script:
+    - build_repo_with_dependencies_ros2.sh release v2x_amqp_connector_lib
+
+.test_library:
+  stage: library_test
+  artifacts:
+    when: always
+    expire_in: 2 days
+    paths:
+      - coverage_details
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+      junit: report_lib_*.xml
+  coverage: /^\s*lines:\s*\d+.\d+\%/
+  script:
+    - build_repo_with_dependencies_ros2.sh coverage v2x_amqp_connector_lib
+    - source ./colcon_build/install/setup.bash
+    - ./colcon_build/build/v2x_amqp_connector_lib/test/cpp/v2x_amqp_connector_lib_test --gtest_output="xml:report_lib_cpp.xml"
+    - gcovr --cobertura-pretty --exclude-unreachable-branches --print-summary -o coverage.xml --filter src/v2x_amqp_connector/library --exclude src/v2x_amqp_connector/library/test
+    - mkdir coverage_details
+    - gcovr --html-details --exclude-unreachable-branches -o coverage_details/coverage.html --filter src/v2x_amqp_connector/library --exclude src/v2x_amqp_connector/library/test
+    - pytest src/v2x_amqp_connector/library/test/python --junitxml=report_lib_python.xml
+
+.build_ros:
+  stage: ros
+  artifacts:
+    expire_in: 2 days
+    reports:
+      junit: report_ros_python.xml
+  script:
+    # delete any src folders that are still around from previous runs
+    - rm -rf src
+    - source gitlab-ros.sh
+    # create colcon workspace with all dependencies
+    - setup_repo_workspace_with_dependencies.sh
+    # make source folders older than the build/devel folders so that make will not rebuild the targets
+    - find ./src -exec touch -t 202001010000 {} \;
+    # build only missing packages
+    - build_colcon_workspace.sh release v2x_amqp_connector
+    - source ./colcon_build/install/setup.bash
+    - pytest src/v2x_amqp_connector/ros2/test/python --junitxml=report_ros_python.xml
+
+build_library_iron:
+  extends: .build_library
+  image: $image_aduulm_iron
+
+test_library_iron:
+  extends: .test_library
+  image: $image_aduulm_iron
+
+build_ros_iron:
+  extends: .build_ros
+  image: $image_aduulm_iron
+
+build_library_rolling:
+  extends: .build_library
+  image: $image_aduulm_rolling
+
+test_library_rolling:
+  extends: .test_library
+  image: $image_aduulm_rolling
+
+build_ros_rolling:
+  extends: .build_ros
+  image: $image_aduulm_rolling

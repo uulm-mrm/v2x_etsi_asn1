@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>v2x_amqp_connector_lib</name>
+  <version>0.0.1</version>
+  <description>The v2x_amqp_connector package</description>
+  <author email="jan.strohbeck@uni-ulm.de">Jan Strohbeck</author>
+  <maintainer email="jan.strohbeck@uni-ulm.de">Jan Strohbeck</maintainer>
+
+  <license>Apache 2.0</license>
+  <build_depend>aduulm_cmake_tools</build_depend>
+  <depend>aduulm_logger_lib</depend>
+
+  <export>
+    <build_type>cmake</build_type>
+  </export>
+</package>
