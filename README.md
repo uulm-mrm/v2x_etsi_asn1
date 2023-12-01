@@ -19,8 +19,9 @@ The original definitions can be found here:
  - VAM release2 (https://forge.etsi.org/rep/ITS/asn1/vam-ts103300_3 branch master commit c6db4d08)
 
 Summary of changes:
- - CDD: Increased range of variances
- - CPM: Added container datatype for trajectory predictions
+ - AngleConfidence, SpeedConfidence: Increased number of bits to express higher variances
+ - PerceivedObject: Added optional associatedStationID field for tracks associated with recognized ITS stations (by matching CAMs to tracks)
+ - PerceivedObject: Added container datatype for trajectory predictions (PredictionsContainer)
 
 Dependencies
 ============

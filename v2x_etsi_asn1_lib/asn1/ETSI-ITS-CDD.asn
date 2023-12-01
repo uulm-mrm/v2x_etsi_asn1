@@ -392,9 +392,9 @@ AltitudeValue ::= INTEGER {
  * @revision: Created in V2.1.1
 */
 AngleConfidence ::= INTEGER {
-    outOfRange  (126),
-    unavailable (127)
-} (1..127)
+    outOfRange  (511),
+    unavailable (512)
+} (1..512)
 
 /**
  * This DE indicates the angular speed confidence value which represents the estimated absolute accuracy of an angular speed value with a default confidence level of 95 %.
@@ -2179,7 +2179,10 @@ MatrixIncludedComponents::= BIT STRING{
     zAngle                       (9),
     yAngle                      (10),
     xAngle                      (11),
-    zAngularVelocity              (12)
+    zAngularVelocity            (12),
+    objectDimensionZ            (13),
+    objectDimensionY            (14),
+    objectDimensionX            (15)
 } (SIZE(13,...))
 
 /**
@@ -3123,9 +3126,9 @@ SpecialTransportType ::= BIT STRING {
  * @revision: Description revised in V2.1.1
  */
 SpeedConfidence ::= INTEGER {
-    outOfRange  (126),
-    unavailable (127)
-} (1..127)
+    outOfRange  (4095),
+    unavailable (4096)
+} (1..4096)
 
 /**
  * This DE represents a speed limitation applied to a geographical position, a road section or a geographical region.
@@ -6242,6 +6245,61 @@ PerceivedObject ::= SEQUENCE {
     sensorIdList                                      SequenceOfIdentifier1B OPTIONAL,
     classification                                    ObjectClassDescription OPTIONAL,
     mapPosition                                       MapPosition OPTIONAL,
+    ...,
+    predictions                                       PredictionsContainer OPTIONAL,
+    associatedStationID                               StationId OPTIONAL
+}
+
+PathPointCovariance ::= SEQUENCE {
+    xConfidence PredictionDistanceConfidence,
+    yConfidence PredictionDistanceConfidence,
+    correlation CorrelationCellValue
+}
+
+/**
+ * @unit: 0,1 metre
+ */
+PredictionDistanceConfidence          ::= INTEGER {
+    outOfRange(510),
+    unavailable(511)
+} (0..511)
+
+PredictionsContainer ::= SEQUENCE {
+    deltaT                PredictionDeltaTime,
+    predictions           PredictionsList
+}
+
+PredictionsList ::= SEQUENCE SIZE(1..3, ...) OF Prediction
+
+PathPrediction ::= SEQUENCE SIZE(1..10, ...) OF PathPointWithCov
+
+PredictionDeltaTime ::= INTEGER {
+    oneHundredMilliseconds(1),
+    twoHundredMilliseconds(2),
+    twoHundredAndFiftyMilliseconds(3),
+    fiveHundredMilliseconds(4),
+    oneSecond(5),
+    twoSeconds(6)
+} (1..6, ...)
+
+/**
+ * @unit: 0,01 metre
+ */
+DistanceOffset               ::= INTEGER{
+    negativeOutOfRange (-4096),
+    positiveOutOfRange (4095)
+} (-4096..4095)
+
+PathPointWithCov ::= SEQUENCE {
+    xDistanceOffset       DistanceOffset,
+    yDistanceOffset       DistanceOffset,
+    covariance            PathPointCovariance OPTIONAL,
+    ...
+}
+
+Prediction ::= SEQUENCE {
+    path                  PathPrediction,
+    pathProbability       ConfidenceLevel,
     ...
 }
 
