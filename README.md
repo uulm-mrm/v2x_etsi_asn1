@@ -18,8 +18,9 @@ The original definitions can be found here:
  - CAM release2 draft (https://forge.etsi.org/rep/ITS/asn1/cam_ts103900 branch master commit dc61f620)
  - VAM release2 (https://forge.etsi.org/rep/ITS/asn1/vam-ts103300_3 branch master commit c6db4d08)
 
-Summary of changes:
+Summary of changes (diff can be found [here](https://github.com/uulm-mrm/v2x_etsi_asn1/commit/f812f7a86b002a7acebf74427a6a76fb76aaa886)):
  - AngleConfidence, SpeedConfidence: Increased number of bits to express higher variances
+ - MatrixIncludedComponents: Allow correlation entries between object dimensions and other state variables
  - PerceivedObject: Added optional associatedStationID field for tracks associated with recognized ITS stations (by matching CAMs to tracks)
  - PerceivedObject: Added container datatype for trajectory predictions (PredictionsContainer)
 
