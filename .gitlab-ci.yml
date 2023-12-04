@@ -1,0 +1,17 @@
+variables:
+  GIT_STRATEGY: none
+  image_aduulm_rolling: mrm-git.e-technik.uni-ulm.de:4567/aduulm/docker_images/aduulm-ros2-rolling:latest
+  image_aduulm_iron: mrm-git.e-technik.uni-ulm.de:4567/aduulm/docker_images/aduulm-ros2-iron:latest
+
+.common:
+  script:
+    - build_repo_with_dependencies_ros2.sh
+    - source ./colcon_build/install/setup.bash && ./colcon_build/build/v2x_etsi_asn1_lib/test/v2x_etsi_asn1_lib_test
+
+ros2_rolling_build:
+  extends: .common
+  image: $image_aduulm_rolling
+
+ros2_iron_build:
+  extends: .common
+  image: $image_aduulm_iron
