@@ -2183,7 +2183,7 @@ MatrixIncludedComponents::= BIT STRING{
     objectDimensionZ            (13),
     objectDimensionY            (14),
     objectDimensionX            (15)
-} (SIZE(13,...))
+} (SIZE(16,...))
 
 /**
  * This DE represents the type of facility layer message.
