@@ -24,6 +24,8 @@ Summary of changes (diff can be found [here](https://github.com/uulm-mrm/v2x_ets
  - PerceivedObject: Added optional associatedStationID field for tracks associated with recognized ITS stations (by matching CAMs to tracks)
  - PerceivedObject: Added container datatype for trajectory predictions (PredictionsContainer)
 
+The MCM definition is based on our paper [An Extended Maneuver Coordination Protocol with Support for Urban Scenarios and Mixed Traffic](https://oparu.uni-ulm.de/xmlui/handle/123456789/42038).
+
 Dependencies
 ============
 
