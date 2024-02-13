@@ -290,7 +290,7 @@ void ETSIAMQPTransceiverBase::handleCPM(const std::shared_ptr<const CollectivePe
   }
 
   // discard old CPMs
-  static const auto max_keep_time = 2000'000'000ULL;
+  static const auto max_keep_time = 60'000'000'000ULL;
   for (auto& [station_id, station_id_cpms] : received_cpm_msgs_)
   {
     for (auto& [r_time, cpm_segments] : station_id_cpms)
