@@ -18,7 +18,7 @@ static inline auto encodeValue(auto value, double unit, auto oorL, auto oorH)
 static inline auto encodeConfidenceFromStdDev(double stddev, double unit, auto oor)
 {
   return std::clamp<int64_t>(
-      static_cast<int64_t>(std::round(stddev / unit * confidence95)), 0, static_cast<int64_t>(oor));
+      static_cast<int64_t>(std::round(stddev / unit * confidence95)), 1, static_cast<int64_t>(oor));
 }
 
 static inline auto encodeWgsAngleNoCorrection(double angle_rad)
