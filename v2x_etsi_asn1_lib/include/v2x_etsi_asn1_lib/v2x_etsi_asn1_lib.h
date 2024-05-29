@@ -53,14 +53,14 @@ public:
                std::string pw,
                std::string filter_query = "");
   void disconnect();
-  bool sendETSIMsg(const asn_TYPE_descriptor_t* type,
-                   ETSIMessageType message_type,
-                   void* pMsg,
-                   std::optional<StationId_t> destination_station_id = {});
-  bool sendEncodedETSIMsg(const char* buffer,
-                          size_t size,
-                          ETSIMessageType message_type,
-                          std::optional<StationId_t> destination_station_id = {});
+  virtual bool sendETSIMsg(const asn_TYPE_descriptor_t* type,
+                           ETSIMessageType message_type,
+                           void* pMsg,
+                           std::optional<StationId_t> destination_station_id = {});
+  virtual bool sendEncodedETSIMsg(const char* buffer,
+                                  size_t size,
+                                  ETSIMessageType message_type,
+                                  std::optional<StationId_t> destination_station_id = {});
 
   static uint64_t decodeTimestampIts(const TimestampIts_t* timestamp);
   static void encodeTimestampIts(uint64_t timestamp, TimestampIts_t* timestamp_out);
